@@ -18,9 +18,10 @@ The meme is live as a public post on X from @archietecture1, carrying
 `makefun-gravel-bell-dome`. The post stays public until the results
 are out, as the bounty asks. `POST.json` names that post's address, and
 `main.ts` is the entry's verifiable half: it reads POST.json and the
-meme, prints the meme's sha256, and reports any problem it finds —
-for example the placeholder status id that stood in POST.json before
-the meme was posted.
+meme, prints the meme's sha256, reports any problem it finds — for
+example the placeholder status id that stood in POST.json before the
+meme was posted — and delivers a copy of POST.json to the output
+directory for the grader's gate.
 
 ## Files
 

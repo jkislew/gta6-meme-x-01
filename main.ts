@@ -7,13 +7,15 @@
 // carries the bounty link and the play code below.
 //
 // This program is the checkable half of that entry. It opens POST.json
-// to learn the post's address, hashes meme.png, and prints one fixed
-// log line per fact. Node.js standard library only, no network, and
-// the same files always produce the same log.
+// to learn the post's address, hashes meme.png, prints one fixed log
+// line per fact, and delivers a copy of POST.json to the output
+// directory, where the grader's gate reads the post's address.
+// Node.js standard library only, no network, and the same files
+// always produce the same log and the same delivered copy.
 //
 // Run it with: node main.ts
 
-import { readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,6 +27,18 @@ const MEME_NAME = "meme.png";
 const PLACEHOLDER_ID = "0000000000000000000";
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+// In the grader's container the repository sits at /bot and the gate
+// reads the delivered post address from /output; outside it, the two
+// MAKEFUN_*_DIR variables stand in for those places. Delivering the
+// entry means copying POST.json there, exactly as it stands.
+const BOT_DIR = process.env.MAKEFUN_BOT_DIR ?? "/bot";
+const OUTPUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+
+function deliverPost(): void {
+  mkdirSync(OUTPUT_DIR, { recursive: true });
+  copyFileSync(join(BOT_DIR, "POST.json"), join(OUTPUT_DIR, "POST.json"));
+}
 
 function postAddress(): string {
   const text = readFileSync(join(here, "POST.json"), "utf8");
@@ -77,6 +91,7 @@ function run(): void {
   const meme = memeFingerprint();
   const problems = [...addressProblems(address), ...codeProblems(PLAY_CODE)];
 
+  deliverPost();
   const lines = [
     `competition: ${SLUG}`,
     `bounty: ${BOUNTY_PAGE}`,
